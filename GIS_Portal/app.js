@@ -12,6 +12,10 @@ let originalDaycarePoints = null;
 let townLayer = null;
 let daycareLayer = null;
 let riskChart = null;
+let pointLayers = {};
+let originalPointDatasets = {};
+let pointDatasets = {};
+let activePointLayerIds = new Set();
 
 let activeTheme = 'flood'; // 'flood' or 'temp'
 let activeScenario = 'current'; // 'current', 'gwl15', 'gwl20', 'gwl40'
@@ -163,6 +167,98 @@ const caseColors = {
     '未知': '#94a3b8'    // Slate
 };
 
+const POINT_REGISTRY = {
+    daycare: {
+        id: 'daycare',
+        label: '日照與小規機構',
+        shortLabel: '日照',
+        icon: 'fa-house-chimney-medical',
+        file: 'daycare_points.json',
+        defaultVisible: true,
+        idField: 'id',
+        nameField: 'name',
+        townField: 'town',
+        addressField: 'address',
+        phoneField: 'phone',
+        countLabel: '日照',
+        emptyText: '本區尚無日照與小規機構',
+        categoryFields: [
+            { field: 'case_type', tagClass: 'tag-case' },
+            { field: 'service_type', tagClass: 'tag-service' }
+        ],
+        popupFields: [
+            { field: 'town', label: '服務地區' },
+            { field: 'case_type', label: '個案類型' },
+            { field: 'service_type', label: '服務類型' },
+            { field: 'work_type', label: '業務類型' },
+            { field: 'staff_count', label: '人力數', suffix: ' 人' },
+            { field: 'shade_info', label: '遮蔭資訊' },
+            { field: 'phone', label: '聯絡電話' },
+            { field: 'address', label: '機構地址' },
+            { field: 'risk_note', label: '風險註記', type: 'risk' },
+            { field: 'adaptation_action', label: '調適作為', type: 'action' }
+        ],
+        listFields: [
+            { field: 'phone', icon: 'fa-phone' },
+            { field: 'address', icon: 'fa-map-location-dot' },
+            { field: 'work_type', icon: 'fa-briefcase' },
+            { field: 'staff_count', icon: 'fa-users', suffix: ' 人' },
+            { field: 'shade_info', icon: 'fa-tree' },
+            { field: 'risk_note', icon: 'fa-triangle-exclamation', type: 'risk' },
+            { field: 'adaptation_action', icon: 'fa-screwdriver-wrench', type: 'action' }
+        ],
+        marker: {
+            colorField: 'case_type',
+            colorMap: caseColors,
+            fallbackColor: '#94a3b8'
+        }
+    },
+    envFacilities: {
+        id: 'envFacilities',
+        label: '環保局業務點位',
+        shortLabel: '環保',
+        icon: 'fa-recycle',
+        file: 'env_facilities.json',
+        defaultVisible: false,
+        idField: 'id',
+        nameField: 'name',
+        townField: 'town',
+        addressField: 'address',
+        countLabel: '環保點位',
+        categoryFields: [
+            { field: 'work_type', tagClass: 'tag-service' },
+            { field: 'source_type', tagClass: 'tag-case' }
+        ],
+        popupFields: [
+            { field: 'town', label: '所在鄉鎮' },
+            { field: 'work_type', label: '業務類型' },
+            { field: 'staff_count', label: '人力數', suffix: ' 人' },
+            { field: 'shade_info', label: '遮蔭資訊' },
+            { field: 'phone', label: '聯絡電話' },
+            { field: 'address', label: '位置地址' },
+            { field: 'risk_note', label: '風險註記', type: 'risk' },
+            { field: 'adaptation_action', label: '調適作為', type: 'action' }
+        ],
+        listFields: [
+            { field: 'work_type', icon: 'fa-briefcase' },
+            { field: 'staff_count', icon: 'fa-users', suffix: ' 人' },
+            { field: 'shade_info', icon: 'fa-tree' },
+            { field: 'phone', icon: 'fa-phone' },
+            { field: 'address', icon: 'fa-map-location-dot' },
+            { field: 'risk_note', icon: 'fa-triangle-exclamation', type: 'risk' },
+            { field: 'adaptation_action', icon: 'fa-screwdriver-wrench', type: 'action' }
+        ],
+        marker: {
+            color: '#34d399',
+            fallbackColor: '#34d399'
+        }
+    }
+};
+
+Object.values(POINT_REGISTRY).forEach(config => {
+    if (config.defaultVisible) activePointLayerIds.add(config.id);
+});
+
 // Document Ready
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
@@ -205,12 +301,31 @@ function initMap() {
 // ==========================================================================
 function loadData() {
     // Fetch pre-calibrated geojson files directly (clean baseline data with correct temperature fields)
+    const pointLoaders = Object.values(POINT_REGISTRY).map(config =>
+        fetch(`${config.file}?t=${new Date().getTime()}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`${config.file} ${res.status}`);
+                return res.json();
+            })
+            .then(data => ({ id: config.id, data }))
+            .catch(err => {
+                console.warn(`Point dataset skipped: ${config.file}`, err);
+                activePointLayerIds.delete(config.id);
+                return { id: config.id, data: null };
+            })
+    );
+
     Promise.all([
         fetch(`changhua_towns.json?t=${new Date().getTime()}`).then(res => res.json()),
-        fetch(`daycare_points.json?t=${new Date().getTime()}`).then(res => res.json())
-    ]).then(([towns, daycares]) => {
+        Promise.all(pointLoaders)
+    ]).then(([towns, pointResults]) => {
         originalTownGeoJson = towns;
-        originalDaycarePoints = daycares;
+        originalPointDatasets = {};
+        pointResults.forEach(result => {
+            if (result.data) originalPointDatasets[result.id] = result.data;
+        });
+        originalDaycarePoints = originalPointDatasets.daycare || null;
+        renderPointLayerSelector();
 
         // Apply calibration based on initial slider values (default 0)
         applyCalibration();
@@ -225,7 +340,7 @@ function loadData() {
 let activeWraData = null;
 
 function applyCalibration() {
-    if (!originalTownGeoJson || !originalDaycarePoints) return;
+    if (!originalTownGeoJson) return;
 
     const lonShift = parseFloat(document.getElementById('slider-lon-shift').value);
     const latShift = parseFloat(document.getElementById('slider-lat-shift').value);
@@ -238,7 +353,11 @@ function applyCalibration() {
 
     // Deep copy original data
     townGeoJsonData = JSON.parse(JSON.stringify(originalTownGeoJson));
-    daycarePointsData = JSON.parse(JSON.stringify(originalDaycarePoints));
+    pointDatasets = {};
+    Object.entries(originalPointDatasets).forEach(([id, data]) => {
+        pointDatasets[id] = JSON.parse(JSON.stringify(data));
+    });
+    daycarePointsData = pointDatasets.daycare || null;
 
     // Define approximate centroid of Changhua for scaling origin
     const originLon = 120.45;
@@ -276,10 +395,18 @@ function applyCalibration() {
         }
     }
 
+    Object.values(pointDatasets).forEach(dataset => {
+        dataset.features.forEach(f => {
+            if (f.geometry && f.geometry.coordinates) {
+                transformCoords(f.geometry.coordinates, lonShift, latShift, scaleFactor);
+            }
+        });
+    });
+
     // Re-render layers and statistics
     updateLayers();
     updateStatsAndChart();
-    populateDaycareList();
+    populatePointList();
 }
 
 // ==========================================================================
@@ -391,16 +518,74 @@ function isPointInMultiPolygon(x, y, coordinates) {
     return false;
 }
 
+function getConfigValue(config, key, fallback = null) {
+    return config[key] || fallback;
+}
+
+function getFeatureValue(props, field) {
+    if (!field) return '';
+    const value = props[field];
+    return value === undefined || value === null ? '' : value;
+}
+
+function hasDisplayValue(value) {
+    return value !== undefined && value !== null && String(value).trim() !== '';
+}
+
+function getFeatureId(feature, config) {
+    const props = feature.properties || {};
+    return String(getFeatureValue(props, config.idField) || getFeatureValue(props, config.nameField));
+}
+
+function getFeatureName(feature, config) {
+    return getFeatureValue(feature.properties || {}, config.nameField) || '未命名點位';
+}
+
+function getFeatureTown(feature, config) {
+    return getFeatureValue(feature.properties || {}, config.townField);
+}
+
+function getPointKey(feature, config) {
+    return `${config.id}:${getFeatureId(feature, config)}`;
+}
+
+function getTownRiskMap() {
+    const riskField = getActiveRiskField();
+    const townRisks = {};
+    if (!townGeoJsonData) return townRisks;
+    townGeoJsonData.features.forEach(feat => {
+        townRisks[feat.properties.town_name] = feat.properties[riskField] || 1;
+    });
+    return townRisks;
+}
+
+function getFeatureRisk(feature, config) {
+    const town = getFeatureTown(feature, config);
+    return getTownRiskMap()[town] || 1;
+}
+
+function getActivePointEntries() {
+    return Object.values(POINT_REGISTRY)
+        .filter(config => activePointLayerIds.has(config.id) && pointDatasets[config.id])
+        .map(config => ({ config, dataset: pointDatasets[config.id] }));
+}
+
+function getActivePointFeatures() {
+    return getActivePointEntries().flatMap(({ config, dataset }) =>
+        dataset.features.map(feature => ({ config, feature }))
+    );
+}
+
 function computeIntersections() {
     daycareIntersectResults = {};
-    if (activeTheme === 'flood' && activeFloodLayers.wra && activeWraData && daycarePointsData) {
-        daycarePointsData.features.forEach(dc => {
-            const coords = dc.geometry.coordinates;
+    if (activeTheme === 'flood' && activeFloodLayers.wra && activeWraData) {
+        getActivePointFeatures().forEach(({ config, feature }) => {
+            const coords = feature.geometry.coordinates;
             const x = coords[0];
             const y = coords[1];
             for (let feat of activeWraData.features) {
                 if (isPointInMultiPolygon(x, y, feat.geometry.coordinates)) {
-                    daycareIntersectResults[dc.properties.name] = feat.properties.depth_type;
+                    daycareIntersectResults[getPointKey(feature, config)] = feat.properties.depth_type;
                     break;
                 }
             }
@@ -418,6 +603,8 @@ function updateLayers() {
     if (townLayer) map.removeLayer(townLayer);
     if (daycareLayer) map.removeLayer(daycareLayer);
     if (wraLayer) map.removeLayer(wraLayer);
+    Object.values(pointLayers).forEach(layer => map.removeLayer(layer));
+    pointLayers = {};
 
     // Compute spatial intersections first
     computeIntersections();
@@ -472,27 +659,71 @@ function updateLayers() {
         onEachFeature: onEachTownFeature
     }).addTo(map);
 
-    // 4. Add Daycare Point Markers
-    daycareLayer = L.geoJSON(daycarePointsData, {
-        pointToLayer: (feature, latlng) => {
-            const name = feature.properties.name;
-            const caseType = feature.properties.case_type || '未知';
-            const markerColor = caseColors[caseType] || '#94a3b8';
+    // 4. Add registry-driven business point markers
+    renderPointLayers();
+}
 
-            const isFlooded = daycareIntersectResults[name];
+function getMarkerColor(feature, config) {
+    const markerConfig = config.marker || {};
+    if (markerConfig.color) return markerConfig.color;
+    const value = getFeatureValue(feature.properties || {}, markerConfig.colorField);
+    return (markerConfig.colorMap && markerConfig.colorMap[value]) || markerConfig.fallbackColor || '#94a3b8';
+}
 
-            // If daycare is in WRA flooded zone, style it with red alert border and larger radius
-            return L.circleMarker(latlng, {
-                radius: isFlooded ? 8 : 6,
-                fillColor: markerColor,
-                fillOpacity: 0.9,
-                color: isFlooded ? '#ef4444' : '#ffffff',
-                weight: isFlooded ? 3 : 1.5,
-                className: isFlooded ? 'daycare-marker warning-pulse' : 'daycare-marker'
-            });
-        },
-        onEachFeature: onEachDaycareFeature
-    }).addTo(map);
+function createRiskOutlinedMarker(latlng, markerColor, riskVal, floodDepth) {
+    const riskColor = riskColors[riskVal] || '#94a3b8';
+    const isHighRisk = riskVal >= 4;
+    const isFlooded = Boolean(floodDepth);
+    const radiusBoost = isFlooded || isHighRisk ? 1.5 : 0;
+
+    const outerWhiteRing = L.circleMarker(latlng, {
+        radius: 10 + radiusBoost,
+        fill: false,
+        color: '#ffffff',
+        weight: 4,
+        opacity: 0.98,
+        interactive: false,
+        className: 'point-outer-ring'
+    });
+
+    const riskRing = L.circleMarker(latlng, {
+        radius: 8 + radiusBoost,
+        fill: false,
+        color: riskColor,
+        weight: isHighRisk ? 4 : 3,
+        opacity: 1,
+        interactive: false,
+        className: 'point-risk-ring'
+    });
+
+    const coreMarker = L.circleMarker(latlng, {
+        radius: 5.5 + radiusBoost,
+        fillColor: markerColor,
+        fillOpacity: 0.95,
+        color: isFlooded ? '#ef4444' : '#ffffff',
+        weight: isFlooded ? 2.5 : 1.5,
+        opacity: 1,
+        className: isFlooded ? 'daycare-marker warning-pulse' : 'daycare-marker'
+    });
+
+    return L.featureGroup([outerWhiteRing, riskRing, coreMarker]);
+}
+
+function renderPointLayers() {
+    getActivePointEntries().forEach(({ config, dataset }) => {
+        pointLayers[config.id] = L.geoJSON(dataset, {
+            pointToLayer: (feature, latlng) => {
+                const markerColor = getMarkerColor(feature, config);
+                const floodDepth = daycareIntersectResults[getPointKey(feature, config)];
+                const riskVal = getFeatureRisk(feature, config);
+
+                return createRiskOutlinedMarker(latlng, markerColor, riskVal, floodDepth);
+            },
+            onEachFeature: (feature, layer) => onEachPointFeature(feature, layer, config)
+        }).addTo(map);
+    });
+
+    daycareLayer = pointLayers.daycare || null;
 }
 
 // Interactive events for town polygons
@@ -536,7 +767,7 @@ function selectTownFeature(e) {
     // Zoom/Pan slightly
     map.panTo(e.latlng);
 
-    populateDaycareList();
+    populatePointList();
 
     // Auto-expand mobile drawer if collapsed when selecting a town
     const container = document.querySelector('.app-container');
@@ -549,12 +780,12 @@ function selectTownFeature(e) {
     }
 }
 
-// Popup configuration for daycare markers
-function onEachDaycareFeature(feature, layer) {
+// Popup configuration for registry-driven point markers
+function onEachPointFeature(feature, layer, config) {
     const props = feature.properties;
 
     let warningHtml = '';
-    const warningDepth = daycareIntersectResults[props.name];
+    const warningDepth = daycareIntersectResults[getPointKey(feature, config)];
     if (activeTheme === 'flood' && activeFloodLayers.wra && warningDepth) {
         warningHtml = `
             <div class="popup-row" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 4px; padding: 4px 8px; margin-top: 4px; margin-bottom: 8px;">
@@ -564,33 +795,39 @@ function onEachDaycareFeature(feature, layer) {
         `;
     }
 
-    const content = `
-        <div class="popup-container">
-            <h3 class="popup-title"><i class="fa-solid fa-house-chimney-medical"></i> ${props.name}</h3>
-            ${warningHtml}
-            <div class="popup-row">
-                <span class="popup-label">服務地區</span>
-                <span class="popup-val">${props.town}</span>
-            </div>
-            <div class="popup-row">
-                <span class="popup-label">個案類型</span>
-                <span class="popup-val">${props.case_type}</span>
-            </div>
-            <div class="popup-row">
-                <span class="popup-label">服務類型</span>
-                <span class="popup-val">${props.service_type}</span>
-            </div>
-            <div class="popup-row">
-                <span class="popup-label">聯絡電話</span>
-                <span class="popup-val">${props.phone}</span>
-            </div>
-            <div class="popup-row">
-                <span class="popup-label">機構地址</span>
-                <span class="popup-val">${props.address}</span>
-            </div>
+    const riskVal = getFeatureRisk(feature, config);
+    const riskHtml = `
+        <div class="popup-row">
+            <span class="popup-label">所處風險</span>
+            <span class="popup-val risk-badge badge-${riskVal}">第 ${riskVal} 級</span>
         </div>
     `;
-    layer.bindPopup(content, { maxWidth: 300 });
+
+    const rowsHtml = (config.popupFields || []).map(fieldConfig => {
+        const value = getFeatureValue(props, fieldConfig.field);
+        if (!hasDisplayValue(value)) return '';
+        const text = `${value}${fieldConfig.suffix || ''}`;
+        if (fieldConfig.type === 'risk' || fieldConfig.type === 'action') {
+            const noteClass = fieldConfig.type === 'risk' ? 'popup-note-risk' : 'popup-note-action';
+            return `<div class="popup-note ${noteClass}"><strong>${fieldConfig.label}</strong><br>${text}</div>`;
+        }
+        return `
+            <div class="popup-row">
+                <span class="popup-label">${fieldConfig.label}</span>
+                <span class="popup-val">${text}</span>
+            </div>
+        `;
+    }).join('');
+
+    const content = `
+        <div class="popup-container">
+            <h3 class="popup-title"><i class="fa-solid ${config.icon}"></i> ${getFeatureName(feature, config)}</h3>
+            ${warningHtml}
+            ${riskHtml}
+            ${rowsHtml}
+        </div>
+    `;
+    layer.bindPopup(content, { maxWidth: 340 });
 }
 
 // ==========================================================================
@@ -628,8 +865,8 @@ function getRiskDistribution() {
     let totalHighRisk = 0;
     const riskDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
-    daycarePointsData.features.forEach(feat => {
-        const town = feat.properties.town;
+    getActivePointFeatures().forEach(({ config, feature }) => {
+        const town = getFeatureTown(feature, config);
         const riskVal = townRisks[town] || 1;
 
         riskDistribution[riskVal]++;
@@ -645,9 +882,8 @@ function getWraDepthDistribution() {
     let totalFlooded = 0;
     const depthDistribution = { 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
 
-    daycarePointsData.features.forEach(feat => {
-        const name = feat.properties.name;
-        const depth = daycareIntersectResults[name];
+    getActivePointFeatures().forEach(({ config, feature }) => {
+        const depth = daycareIntersectResults[getPointKey(feature, config)];
         if (depth) {
             totalFlooded++;
             let code = 2;
@@ -664,7 +900,7 @@ function getWraDepthDistribution() {
 }
 
 function updateStatsAndChart() {
-    if (!townGeoJsonData || !daycarePointsData) return;
+    if (!townGeoJsonData) return;
 
     // Dynamically update the legend content
     updateLegendUI();
@@ -673,14 +909,20 @@ function updateStatsAndChart() {
         // NCDR must remain the source for the Lv.4-5 warning card whenever
         // the NCDR layer is visible, even when the WRA potential layer is also overlaid.
         const { totalHighRisk, riskDistribution } = getRiskDistribution();
-        updateHighRiskCard(totalHighRisk, '第 4-5 級警戒日照 (Lv.4-5)');
+        updateHighRiskCard(totalHighRisk, `第 4-5 級警戒${getActivePointSummaryLabel()} (Lv.4-5)`);
         renderChart(riskDistribution);
     } else if (isWraLayerEnabled()) {
         // WRA-only mode has no NCDR Lv.4-5 towns, so summarize flooded daycare sites by depth.
         const { totalFlooded, depthDistribution } = getWraDepthDistribution();
-        updateHighRiskCard(totalFlooded, '淹水警戒日照');
+        updateHighRiskCard(totalFlooded, `淹水警戒${getActivePointSummaryLabel()}`);
         renderChartWRA(depthDistribution);
     }
+}
+
+function getActivePointSummaryLabel() {
+    const activeConfigs = Object.values(POINT_REGISTRY).filter(config => activePointLayerIds.has(config.id) && pointDatasets[config.id]);
+    if (activeConfigs.length === 1) return activeConfigs[0].countLabel || activeConfigs[0].shortLabel || '點位';
+    return '業務點位';
 }
 
 function renderChart(distributionData) {
@@ -776,27 +1018,22 @@ function renderChartWRA(distribution) {
 function updateInfoWidget(props) {
     const infoDiv = document.getElementById('info-content');
 
-    // Count daycares in this town
-    const daycareCount = daycarePointsData ? daycarePointsData.features.filter(f => f.properties.town === props.town_name).length : 0;
+    // Count active business points in this town
+    const pointCount = getActivePointFeatures().filter(({ config, feature }) => getFeatureTown(feature, config) === props.town_name).length;
 
     if (isWraLayerEnabled()) {
-        let floodedCount = 0;
-        if (daycarePointsData) {
-            daycarePointsData.features.forEach(f => {
-                if (f.properties.town === props.town_name && daycareIntersectResults[f.properties.name]) {
-                    floodedCount++;
-                }
-            });
-        }
+        const floodedCount = getActivePointFeatures().filter(({ config, feature }) =>
+            getFeatureTown(feature, config) === props.town_name && daycareIntersectResults[getPointKey(feature, config)]
+        ).length;
         infoDiv.innerHTML = `
             <div class="hover-town-title">${props.town_name}</div>
             <div class="hover-stat-row">
-                <span class="hover-stat-label">轄區內日照機構數</span>
-                <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${daycareCount} 家</span>
+                <span class="hover-stat-label">轄區內業務點位數</span>
+                <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${pointCount} 處</span>
             </div>
             <div class="hover-stat-row" style="margin-top: 8px; border-top: 1px dashed rgba(239,68,68,0.3); padding-top: 8px;">
-                <span class="hover-stat-label" style="color: #ef4444; font-weight: bold;">淹水警戒機構數</span>
-                <span class="hover-stat-val risk-badge badge-5">${floodedCount} 家</span>
+                <span class="hover-stat-label" style="color: #ef4444; font-weight: bold;">淹水警戒點位數</span>
+                <span class="hover-stat-val risk-badge badge-5">${floodedCount} 處</span>
             </div>
         `;
     } else {
@@ -828,8 +1065,8 @@ function updateInfoWidget(props) {
                     <span class="hover-stat-val risk-badge badge-${riskVal}">第 ${riskVal} 級</span>
                 </div>
                 <div class="hover-stat-row" style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
-                    <span class="hover-stat-label">轄區內日照機構數</span>
-                    <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${daycareCount} 家</span>
+                    <span class="hover-stat-label">轄區內業務點位數</span>
+                    <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${pointCount} 處</span>
                 </div>
             `;
         } else {
@@ -849,8 +1086,8 @@ function updateInfoWidget(props) {
                     <span class="hover-stat-val risk-badge badge-${riskVal}">第 ${riskVal} 級</span>
                 </div>
                 <div class="hover-stat-row" style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
-                    <span class="hover-stat-label">轄區內日照機構數</span>
-                    <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${daycareCount} 家</span>
+                    <span class="hover-stat-label">轄區內業務點位數</span>
+                    <span class="hover-stat-val" style="color: var(--secondary); font-weight: 700;">${pointCount} 處</span>
                 </div>
             `;
         }
@@ -862,48 +1099,65 @@ function clearInfoWidget() {
     infoDiv.innerHTML = `<p class="placeholder">懸停於行政區上以載入氣候風險指標...</p>`;
 }
 
-// Populate the daycare list inside the sidebar
-function populateDaycareList() {
+// Populate the active business point list inside the sidebar
+function populatePointList() {
     const container = document.getElementById('daycare-list-container');
     container.innerHTML = '';
 
-    if (!daycarePointsData) return;
+    const activeFeatures = getActivePointFeatures();
 
-    let filtered = daycarePointsData.features;
+    let filtered = activeFeatures;
     if (selectedTown) {
-        filtered = daycarePointsData.features.filter(feat => feat.properties.town === selectedTown);
+        filtered = activeFeatures.filter(({ config, feature }) => getFeatureTown(feature, config) === selectedTown);
     }
 
     if (filtered.length === 0) {
-        container.innerHTML = `<p class="list-placeholder">本區尚無設置日間照顧服務機構</p>`;
+        container.innerHTML = `<p class="list-placeholder">本區尚無啟用中的業務點位</p>`;
         return;
     }
 
-    filtered.forEach(feat => {
+    filtered.forEach(({ config, feature }) => {
+        const feat = feature;
         const props = feat.properties;
 
         let warningTag = '';
-        const isFlooded = daycareIntersectResults[props.name];
+        const isFlooded = daycareIntersectResults[getPointKey(feat, config)];
         if (activeTheme === 'flood' && activeFloodLayers.wra && isFlooded) {
             warningTag = `<span class="item-tag tag-warning"><i class="fa-solid fa-triangle-exclamation"></i> 淹水警戒: ${isFlooded}m</span>`;
         }
+
+        const riskVal = getFeatureRisk(feat, config);
+        const categoryTags = (config.categoryFields || []).map(fieldConfig => {
+            const value = getFeatureValue(props, fieldConfig.field);
+            if (!hasDisplayValue(value)) return '';
+            return `<span class="item-tag ${fieldConfig.tagClass || 'tag-service'}">${value}</span>`;
+        }).join('');
+        const detailRows = (config.listFields || []).map(fieldConfig => {
+            const value = getFeatureValue(props, fieldConfig.field);
+            if (!hasDisplayValue(value)) return '';
+            const text = `${value}${fieldConfig.suffix || ''}`;
+            if (fieldConfig.type === 'risk' || fieldConfig.type === 'action') {
+                const noteClass = fieldConfig.type === 'risk' ? 'item-note-risk' : 'item-note-action';
+                return `<div class="item-note ${noteClass}"><i class="fa-solid ${fieldConfig.icon}"></i> ${text}</div>`;
+            }
+            return `
+                <div class="daycare-item-detail">
+                    <i class="fa-solid ${fieldConfig.icon}"></i> <span>${text}</span>
+                </div>
+            `;
+        }).join('');
 
         const card = document.createElement('div');
         card.className = 'daycare-item-card';
 
         card.innerHTML = `
-            <div class="daycare-item-title">${props.name}</div>
+            <div class="daycare-item-title"><i class="fa-solid ${config.icon}"></i> ${getFeatureName(feat, config)}</div>
             <div class="daycare-item-tags">
-                <span class="item-tag tag-case">${props.case_type}</span>
-                <span class="item-tag tag-service">${props.service_type}</span>
+                <span class="item-tag tag-warning">風險 ${riskVal}</span>
+                ${categoryTags}
                 ${warningTag}
             </div>
-            <div class="daycare-item-detail">
-                <i class="fa-solid fa-phone"></i> <span>${props.phone || '無'}</span>
-            </div>
-            <div class="daycare-item-detail">
-                <i class="fa-solid fa-map-location-dot"></i> <span>${props.address}</span>
-            </div>
+            ${detailRows}
         `;
 
         // Click item zoom to marker and open popup
@@ -911,8 +1165,10 @@ function populateDaycareList() {
             const coords = feat.geometry.coordinates;
             map.setView([coords[1], coords[0]], 14);
 
-            daycareLayer.eachLayer(layer => {
-                if (layer.feature.properties.id === props.id) {
+            const layerGroup = pointLayers[config.id];
+            if (!layerGroup) return;
+            layerGroup.eachLayer(layer => {
+                if (getPointKey(layer.feature, config) === getPointKey(feat, config)) {
                     layer.openPopup();
                 }
             });
@@ -1039,6 +1295,48 @@ function updateRiskOpacityControl() {
     }
 }
 
+function renderPointLayerSelector() {
+    const selector = document.getElementById('point-layer-selector');
+    if (!selector) return;
+
+    selector.innerHTML = Object.values(POINT_REGISTRY).map(config => {
+        const dataset = pointDatasets[config.id] || originalPointDatasets[config.id];
+        const count = dataset ? dataset.features.length : 0;
+        const active = activePointLayerIds.has(config.id) && dataset;
+        return `
+            <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" ${dataset ? '' : 'disabled'}>
+                <span class="point-layer-chip-main"><i class="fa-solid ${config.icon}"></i> ${config.label}</span>
+                <span class="point-layer-chip-meta">${count} 處</span>
+            </button>
+        `;
+    }).join('');
+}
+
+function setupPointLayerSelector() {
+    const selector = document.getElementById('point-layer-selector');
+    if (!selector) return;
+
+    selector.addEventListener('click', event => {
+        const button = event.target.closest('[data-point-layer]');
+        if (!button) return;
+
+        const layerId = button.dataset.pointLayer;
+        if (!pointDatasets[layerId] && !originalPointDatasets[layerId]) return;
+
+        if (activePointLayerIds.has(layerId)) {
+            if (activePointLayerIds.size === 1) return;
+            activePointLayerIds.delete(layerId);
+        } else {
+            activePointLayerIds.add(layerId);
+        }
+
+        renderPointLayerSelector();
+        updateLayers();
+        updateStatsAndChart();
+        populatePointList();
+    });
+}
+
 
 function setupColorThemeControl() {
     const select = document.getElementById('color-theme-select');
@@ -1054,6 +1352,7 @@ function setupColorThemeControl() {
 
 function setupUIControls() {
     setupColorThemeControl();
+    setupPointLayerSelector();
     renderTimelineUI();
 
     // 1. Theme Switcher
@@ -1290,16 +1589,26 @@ function updateLegendUI() {
         </div>
     `;
 
-    const daycareLegend = `
-        <div class="legend-title" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">日照機構類型</div>
+    const pointLegendItems = getActivePointEntries().map(({ config }) => {
+        const markerConfig = config.marker || {};
+        if (markerConfig.colorMap) {
+            return Object.entries(markerConfig.colorMap)
+                .filter(([label]) => label !== '未知')
+                .map(([label, color]) => `<div class="legend-item"><span class="legend-color-box" style="background:${color}; border-radius:50%; border: 2px solid ${riskColors[4]}"></span> <span>${config.shortLabel}｜${label}</span></div>`)
+                .join('');
+        }
+        return `<div class="legend-item"><span class="legend-color-box" style="background:${markerConfig.color || markerConfig.fallbackColor || '#94a3b8'}; border-radius:50%; border: 2px solid ${riskColors[4]}"></span> <span>${config.label}</span></div>`;
+    }).join('');
+
+    const pointLegend = `
+        <div class="legend-title" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">業務點位與風險外框</div>
         <div class="legend-scale">
-            <div class="legend-item"><span class="legend-color-box" style="background:${caseColors['混合型']}; border-radius:50%"></span> <span>混合型機構</span></div>
-            <div class="legend-item"><span class="legend-color-box" style="background:${caseColors['失智型']}; border-radius:50%"></span> <span>失智型特約機構</span></div>
-            <div class="legend-item"><span class="legend-color-box" style="background:${caseColors['失能型']}; border-radius:50%"></span> <span>失能型特約機構</span></div>
+            ${pointLegendItems}
+            <div class="legend-item"><span class="legend-color-box" style="background:#fff; border-radius:50%; border: 3px solid ${riskColors[5]}"></span> <span>外框色代表所處風險等級</span></div>
         </div>
     `;
 
-    legendDiv.innerHTML = `${isNcdrLayerEnabled() ? riskLegend : ''}${isWraLayerEnabled() ? wraLegend : ''}${daycareLegend}`;
+    legendDiv.innerHTML = `${isNcdrLayerEnabled() ? riskLegend : ''}${isWraLayerEnabled() ? wraLegend : ''}${pointLegend}`;
 }
 
 // Legend Widget Initialization
