@@ -167,6 +167,9 @@ const caseColors = {
     '未知': '#94a3b8'    // Slate
 };
 
+const AGGREGATE_POINT_LAYER_ID = 'envFacilities';
+const SPLIT_ENV_POINT_LAYER_IDS = ['envHq', 'envRecycling'];
+
 const POINT_REGISTRY = {
     daycare: {
         id: 'daycare',
@@ -333,6 +336,20 @@ const POINT_REGISTRY = {
 Object.values(POINT_REGISTRY).forEach(config => {
     if (config.defaultVisible) activePointLayerIds.add(config.id);
 });
+
+function normalizeActivePointLayerSelection(changedLayerId = null) {
+    const hasAggregate = activePointLayerIds.has(AGGREGATE_POINT_LAYER_ID);
+    const activeSplitIds = SPLIT_ENV_POINT_LAYER_IDS.filter(id => activePointLayerIds.has(id));
+
+    if (!hasAggregate || activeSplitIds.length === 0) return;
+
+    if (changedLayerId === AGGREGATE_POINT_LAYER_ID) {
+        activeSplitIds.forEach(id => activePointLayerIds.delete(id));
+        return;
+    }
+
+    activePointLayerIds.delete(AGGREGATE_POINT_LAYER_ID);
+}
 
 // Document Ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -1411,6 +1428,7 @@ function setupPointLayerSelector() {
             activePointLayerIds.delete(layerId);
         } else {
             activePointLayerIds.add(layerId);
+            normalizeActivePointLayerSelection(layerId);
         }
 
         renderPointLayerSelector();

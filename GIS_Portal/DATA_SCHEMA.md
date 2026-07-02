@@ -98,6 +98,7 @@ const POINT_REGISTRY = {
 
 - `popupFields` 與 `listFields` 中的欄位只有在值不為空時才顯示。
 - `filterCategory` 會依 GeoJSON properties 的 `category` 欄位篩出獨立點位圖層；未設定時顯示整份資料。
+- 若同一份 GeoJSON 同時提供分類圖層與合計圖層，UI 應避免讓合計圖層與其分類子圖層同時啟用，以免重複統計。
 - `type: 'risk'` 會使用警示樣式，適合舊版 `risk_note`。
 - `type: 'action'` 會使用行動建議樣式，適合舊版 `adaptation_action`。
 - 點位外框會依目前啟用的氣候風險圖層與情境，讀取所在鄉鎮的風險等級渲染；第 4、5 級外框較粗。
