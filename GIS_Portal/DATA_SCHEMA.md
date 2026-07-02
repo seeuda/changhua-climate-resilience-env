@@ -47,52 +47,48 @@
 | 欄位 | 型別 | 顯示方式 | 說明 |
 | --- | --- | --- | --- |
 | `phone` | string | popup / 列表 | 聯絡電話。 |
-| `work_type` | string | popup / 列表 / tag | 業務類型，例如清潔隊、資源回收、空污稽查、環境巡檢。 |
-| `staff_count` | number | popup / 列表 | 工作人員、配置人力或可動員人數。 |
+| `category` | string | popup / 列表 / tag / filter | 設施主分類，例如 `清潔隊部`、`資源回收場`；可搭配 `POINT_REGISTRY.filterCategory` 產生獨立套疊圖層。 |
+| `sub_type` | string | popup / 列表 / tag | 設施細分類，例如清潔隊隊部、清潔隊資源回收場。 |
 | `shade_info` | string | popup / 列表 | 遮蔭、降溫、戶外等待區或補水資訊。 |
-| `risk_note` | string | popup / 列表 | 風險註記；有資料才顯示，適合描述淹水、高溫、交通或服務中斷風險。 |
-| `adaptation_action` | string | popup / 列表 | 建議調適作為；有資料才顯示。 |
-| `source_type` | string | popup / tag | 資料來源或業務分類。 |
+| `note` | string | popup / 列表 | 資料註記；例如座標來源或待補充說明。 |
+| `work_type` | string | popup / 列表 / tag | 舊版欄位仍可使用，若資料尚未轉成 `category` / `sub_type` 可在 registry 指向此欄位。 |
+| `staff_count` | number | popup / 列表 | 舊版欄位仍可使用，用於工作人員、配置人力或可動員人數。 |
+| `risk_note` | string | popup / 列表 | 舊版欄位仍可使用，適合描述淹水、高溫、交通或服務中斷風險。 |
+| `adaptation_action` | string | popup / 列表 | 舊版欄位仍可使用，適合描述建議調適作為。 |
+| `source_type` | string | popup / tag | 舊版欄位仍可使用，表示資料來源或業務分類。 |
 | `updated_at` | string | popup | 資料更新日期，建議使用 `YYYY-MM-DD`。 |
 
 ## POINT_REGISTRY 設定範例
 
 ```js
 const POINT_REGISTRY = {
-  envFacilities: {
-    id: 'envFacilities',
-    label: '環保局業務點位',
-    shortLabel: '環保',
+  envRecycling: {
+    id: 'envRecycling',
+    label: '資源回收場',
+    shortLabel: '回收場',
     icon: 'fa-recycle',
     file: 'env_facilities.json',
     defaultVisible: false,
+    filterCategory: '資源回收場',
     idField: 'id',
     nameField: 'name',
     townField: 'town',
     addressField: 'address',
-    countLabel: '環保點位',
+    countLabel: '回收場',
     categoryFields: [
-      { field: 'work_type', tagClass: 'tag-service' }
+      { field: 'category', tagClass: 'tag-service' },
+      { field: 'sub_type', tagClass: 'tag-case' }
     ],
     popupFields: [
       { field: 'town', label: '所在鄉鎮' },
-      { field: 'work_type', label: '業務類型' },
-      { field: 'staff_count', label: '人力數', suffix: ' 人' },
+      { field: 'category', label: '設施類別' },
+      { field: 'sub_type', label: '設施型態' },
       { field: 'shade_info', label: '遮蔭資訊' },
       { field: 'address', label: '地址' },
-      { field: 'risk_note', label: '風險註記', type: 'risk' },
-      { field: 'adaptation_action', label: '調適作為', type: 'action' }
-    ],
-    listFields: [
-      { field: 'work_type', icon: 'fa-briefcase' },
-      { field: 'staff_count', icon: 'fa-users', suffix: ' 人' },
-      { field: 'shade_info', icon: 'fa-tree' },
-      { field: 'risk_note', icon: 'fa-triangle-exclamation', type: 'risk' },
-      { field: 'adaptation_action', icon: 'fa-screwdriver-wrench', type: 'action' },
-      { field: 'address', icon: 'fa-map-location-dot' }
+      { field: 'note', label: '資料註記' }
     ],
     marker: {
-      color: '#22c55e'
+      color: '#10b981'
     }
   }
 };
@@ -101,8 +97,10 @@ const POINT_REGISTRY = {
 ## 顯示規則
 
 - `popupFields` 與 `listFields` 中的欄位只有在值不為空時才顯示。
-- `type: 'risk'` 會使用警示樣式，適合 `risk_note`。
-- `type: 'action'` 會使用行動建議樣式，適合 `adaptation_action`。
+- `filterCategory` 會依 GeoJSON properties 的 `category` 欄位篩出獨立點位圖層；未設定時顯示整份資料。
+- 若同一份 GeoJSON 同時提供分類圖層與合計圖層，UI 應避免讓合計圖層與其分類子圖層同時啟用，以免重複統計。
+- `type: 'risk'` 會使用警示樣式，適合舊版 `risk_note`。
+- `type: 'action'` 會使用行動建議樣式，適合舊版 `adaptation_action`。
 - 點位外框會依目前啟用的氣候風險圖層與情境，讀取所在鄉鎮的風險等級渲染；第 4、5 級外框較粗。
 - 啟用水利署淹水潛勢時，落在淹水潛勢區的點位會再以紅色警戒外框標示。
 

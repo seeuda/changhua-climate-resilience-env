@@ -167,6 +167,9 @@ const caseColors = {
     '未知': '#94a3b8'    // Slate
 };
 
+const AGGREGATE_POINT_LAYER_ID = 'envFacilities';
+const SPLIT_ENV_POINT_LAYER_IDS = ['envHq', 'envRecycling'];
+
 const POINT_REGISTRY = {
     daycare: {
         id: 'daycare',
@@ -213,43 +216,118 @@ const POINT_REGISTRY = {
             fallbackColor: '#94a3b8'
         }
     },
+    envHq: {
+        id: 'envHq',
+        label: '清潔隊隊部',
+        shortLabel: '隊部',
+        icon: 'fa-truck',
+        file: 'env_facilities.json',
+        defaultVisible: false,
+        filterCategory: '清潔隊部',
+        idField: 'id',
+        nameField: 'name',
+        townField: 'town',
+        addressField: 'address',
+        countLabel: '隊部',
+        categoryFields: [
+            { field: 'category', tagClass: 'tag-service' },
+            { field: 'sub_type', tagClass: 'tag-case' }
+        ],
+        popupFields: [
+            { field: 'town', label: '所在鄉鎮' },
+            { field: 'category', label: '設施類別' },
+            { field: 'sub_type', label: '設施型態' },
+            { field: 'shade_info', label: '遮蔭資訊' },
+            { field: 'phone', label: '聯絡電話' },
+            { field: 'address', label: '位置地址' },
+            { field: 'note', label: '資料註記' }
+        ],
+        listFields: [
+            { field: 'sub_type', icon: 'fa-briefcase' },
+            { field: 'shade_info', icon: 'fa-tree' },
+            { field: 'phone', icon: 'fa-phone' },
+            { field: 'address', icon: 'fa-map-location-dot' },
+            { field: 'note', icon: 'fa-circle-info' }
+        ],
+        marker: {
+            color: '#f59e0b',
+            fallbackColor: '#f59e0b'
+        }
+    },
+    envRecycling: {
+        id: 'envRecycling',
+        label: '資源回收場',
+        shortLabel: '回收場',
+        icon: 'fa-recycle',
+        file: 'env_facilities.json',
+        defaultVisible: false,
+        filterCategory: '資源回收場',
+        idField: 'id',
+        nameField: 'name',
+        townField: 'town',
+        addressField: 'address',
+        countLabel: '回收場',
+        categoryFields: [
+            { field: 'category', tagClass: 'tag-service' },
+            { field: 'sub_type', tagClass: 'tag-case' }
+        ],
+        popupFields: [
+            { field: 'town', label: '所在鄉鎮' },
+            { field: 'category', label: '設施類別' },
+            { field: 'sub_type', label: '設施型態' },
+            { field: 'shade_info', label: '遮蔭資訊' },
+            { field: 'phone', label: '聯絡電話' },
+            { field: 'address', label: '位置地址' },
+            { field: 'note', label: '資料註記' }
+        ],
+        listFields: [
+            { field: 'sub_type', icon: 'fa-briefcase' },
+            { field: 'shade_info', icon: 'fa-tree' },
+            { field: 'phone', icon: 'fa-phone' },
+            { field: 'address', icon: 'fa-map-location-dot' },
+            { field: 'note', icon: 'fa-circle-info' }
+        ],
+        marker: {
+            color: '#10b981',
+            fallbackColor: '#10b981'
+        }
+    },
     envFacilities: {
         id: 'envFacilities',
-        label: '環保局業務點位',
+        label: '環保設施合計',
         shortLabel: '環保',
-        icon: 'fa-recycle',
+        icon: 'fa-map-pin',
         file: 'env_facilities.json',
         defaultVisible: false,
         idField: 'id',
         nameField: 'name',
         townField: 'town',
         addressField: 'address',
-        countLabel: '環保點位',
+        countLabel: '環保設施',
         categoryFields: [
-            { field: 'work_type', tagClass: 'tag-service' },
-            { field: 'source_type', tagClass: 'tag-case' }
+            { field: 'category', tagClass: 'tag-service' },
+            { field: 'sub_type', tagClass: 'tag-case' }
         ],
         popupFields: [
             { field: 'town', label: '所在鄉鎮' },
-            { field: 'work_type', label: '業務類型' },
-            { field: 'staff_count', label: '人力數', suffix: ' 人' },
+            { field: 'category', label: '設施類別' },
+            { field: 'sub_type', label: '設施型態' },
             { field: 'shade_info', label: '遮蔭資訊' },
             { field: 'phone', label: '聯絡電話' },
             { field: 'address', label: '位置地址' },
-            { field: 'risk_note', label: '風險註記', type: 'risk' },
-            { field: 'adaptation_action', label: '調適作為', type: 'action' }
+            { field: 'note', label: '資料註記' }
         ],
         listFields: [
-            { field: 'work_type', icon: 'fa-briefcase' },
-            { field: 'staff_count', icon: 'fa-users', suffix: ' 人' },
+            { field: 'category', icon: 'fa-layer-group' },
+            { field: 'sub_type', icon: 'fa-briefcase' },
             { field: 'shade_info', icon: 'fa-tree' },
             { field: 'phone', icon: 'fa-phone' },
             { field: 'address', icon: 'fa-map-location-dot' },
-            { field: 'risk_note', icon: 'fa-triangle-exclamation', type: 'risk' },
-            { field: 'adaptation_action', icon: 'fa-screwdriver-wrench', type: 'action' }
+            { field: 'note', icon: 'fa-circle-info' }
         ],
         marker: {
-            color: '#34d399',
+            colorField: 'category',
+            colorMap: { '清潔隊部': '#f59e0b', '資源回收場': '#10b981' },
             fallbackColor: '#34d399'
         }
     }
@@ -258,6 +336,20 @@ const POINT_REGISTRY = {
 Object.values(POINT_REGISTRY).forEach(config => {
     if (config.defaultVisible) activePointLayerIds.add(config.id);
 });
+
+function normalizeActivePointLayerSelection(changedLayerId = null) {
+    const hasAggregate = activePointLayerIds.has(AGGREGATE_POINT_LAYER_ID);
+    const activeSplitIds = SPLIT_ENV_POINT_LAYER_IDS.filter(id => activePointLayerIds.has(id));
+
+    if (!hasAggregate || activeSplitIds.length === 0) return;
+
+    if (changedLayerId === AGGREGATE_POINT_LAYER_ID) {
+        activeSplitIds.forEach(id => activePointLayerIds.delete(id));
+        return;
+    }
+
+    activePointLayerIds.delete(AGGREGATE_POINT_LAYER_ID);
+}
 
 // Document Ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -564,10 +656,18 @@ function getFeatureRisk(feature, config) {
     return getTownRiskMap()[town] || 1;
 }
 
+function filterPointDataset(dataset, config) {
+    if (!config.filterCategory) return dataset;
+    return {
+        ...dataset,
+        features: (dataset.features || []).filter(feature => feature.properties?.category === config.filterCategory)
+    };
+}
+
 function getActivePointEntries() {
     return Object.values(POINT_REGISTRY)
         .filter(config => activePointLayerIds.has(config.id) && pointDatasets[config.id])
-        .map(config => ({ config, dataset: pointDatasets[config.id] }));
+        .map(config => ({ config, dataset: filterPointDataset(pointDatasets[config.id], config) }));
 }
 
 function getActivePointFeatures() {
@@ -1301,7 +1401,7 @@ function renderPointLayerSelector() {
 
     selector.innerHTML = Object.values(POINT_REGISTRY).map(config => {
         const dataset = pointDatasets[config.id] || originalPointDatasets[config.id];
-        const count = dataset ? dataset.features.length : 0;
+        const count = dataset ? filterPointDataset(dataset, config).features.length : 0;
         const active = activePointLayerIds.has(config.id) && dataset;
         return `
             <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" ${dataset ? '' : 'disabled'}>
@@ -1328,6 +1428,7 @@ function setupPointLayerSelector() {
             activePointLayerIds.delete(layerId);
         } else {
             activePointLayerIds.add(layerId);
+            normalizeActivePointLayerSelection(layerId);
         }
 
         renderPointLayerSelector();
