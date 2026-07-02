@@ -1,0 +1,578 @@
+{
+  "type": "FeatureCollection",
+  "name": "env_facilities",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.621478,
+          23.856985
+        ]
+      },
+      "properties": {
+        "id": "ENV-001",
+        "name": "彰化縣田中鎮清潔隊資源回收場",
+        "town": "田中鎮",
+        "address": "彰化縣田中鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 5,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.634079,
+          23.899169
+        ]
+      },
+      "properties": {
+        "id": "ENV-002",
+        "name": "彰化縣社頭鄉清潔隊資源回收場",
+        "town": "社頭鄉",
+        "address": "彰化縣社頭鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 6,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.629823,
+          23.956572
+        ]
+      },
+      "properties": {
+        "id": "ENV-003",
+        "name": "彰化縣員林市清潔隊資源回收場",
+        "town": "員林市",
+        "address": "彰化縣員林市環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 7,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.589109,
+          24.063401
+        ]
+      },
+      "properties": {
+        "id": "ENV-004",
+        "name": "彰化縣彰化市清潔隊資源回收場",
+        "town": "彰化市",
+        "address": "彰化縣彰化市環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 8,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.535926,
+          24.107142
+        ]
+      },
+      "properties": {
+        "id": "ENV-005",
+        "name": "彰化縣和美鎮清潔隊資源回收場",
+        "town": "和美鎮",
+        "address": "彰化縣和美鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 9,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.492198,
+          24.119966
+        ]
+      },
+      "properties": {
+        "id": "ENV-006",
+        "name": "彰化縣線西鄉清潔隊資源回收場",
+        "town": "線西鄉",
+        "address": "彰化縣線西鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 10,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.515065,
+          24.147236
+        ]
+      },
+      "properties": {
+        "id": "ENV-007",
+        "name": "彰化縣伸港鄉清潔隊資源回收場",
+        "town": "伸港鄉",
+        "address": "彰化縣伸港鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 4,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.540538,
+          24.022256
+        ]
+      },
+      "properties": {
+        "id": "ENV-008",
+        "name": "彰化縣秀水鄉清潔隊資源回收場",
+        "town": "秀水鄉",
+        "address": "彰化縣秀水鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 5,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.588698,
+          24.027464
+        ]
+      },
+      "properties": {
+        "id": "ENV-009",
+        "name": "彰化縣花壇鄉清潔隊資源回收場",
+        "town": "花壇鄉",
+        "address": "彰化縣花壇鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 6,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.656738,
+          23.998816
+        ]
+      },
+      "properties": {
+        "id": "ENV-010",
+        "name": "彰化縣芬園鄉清潔隊資源回收場",
+        "town": "芬園鄉",
+        "address": "彰化縣芬園鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 7,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.518965,
+          23.950059
+        ]
+      },
+      "properties": {
+        "id": "ENV-011",
+        "name": "彰化縣溪湖鎮清潔隊資源回收場",
+        "town": "溪湖鎮",
+        "address": "彰化縣溪湖鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 8,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.589049,
+          23.992061
+        ]
+      },
+      "properties": {
+        "id": "ENV-012",
+        "name": "彰化縣大村鄉清潔隊資源回收場",
+        "town": "大村鄉",
+        "address": "彰化縣大村鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 9,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.496485,
+          23.990995
+        ]
+      },
+      "properties": {
+        "id": "ENV-013",
+        "name": "彰化縣埔鹽鄉清潔隊資源回收場",
+        "town": "埔鹽鄉",
+        "address": "彰化縣埔鹽鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 10,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.559917,
+          23.949625
+        ]
+      },
+      "properties": {
+        "id": "ENV-014",
+        "name": "彰化縣埔心鄉清潔隊資源回收場",
+        "town": "埔心鄉",
+        "address": "彰化縣埔心鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 4,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.56884,
+          23.918268
+        ]
+      },
+      "properties": {
+        "id": "ENV-015",
+        "name": "彰化縣永靖鄉清潔隊資源回收場",
+        "town": "永靖鄉",
+        "address": "彰化縣永靖鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 5,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.656602,
+          23.816366
+        ]
+      },
+      "properties": {
+        "id": "ENV-016",
+        "name": "彰化縣二水鄉清潔隊資源回收場",
+        "town": "二水鄉",
+        "address": "彰化縣二水鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 6,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.429125,
+          23.905887
+        ]
+      },
+      "properties": {
+        "id": "ENV-017",
+        "name": "彰化縣二林鎮清潔隊資源回收場",
+        "town": "二林鎮",
+        "address": "彰化縣二林鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 7,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.49884,
+          23.869943
+        ]
+      },
+      "properties": {
+        "id": "ENV-018",
+        "name": "彰化縣埤頭鄉清潔隊資源回收場",
+        "town": "埤頭鄉",
+        "address": "彰化縣埤頭鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 8,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.392264,
+          23.94789
+        ]
+      },
+      "properties": {
+        "id": "ENV-019",
+        "name": "彰化縣芳苑鄉清潔隊資源回收場",
+        "town": "芳苑鄉",
+        "address": "彰化縣芳苑鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 9,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.350325,
+          23.860531
+        ]
+      },
+      "properties": {
+        "id": "ENV-020",
+        "name": "彰化縣大城鄉清潔隊資源回收場",
+        "town": "大城鄉",
+        "address": "彰化縣大城鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 10,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.441466,
+          23.85202
+        ]
+      },
+      "properties": {
+        "id": "ENV-021",
+        "name": "彰化縣竹塘鄉清潔隊資源回收場",
+        "town": "竹塘鄉",
+        "address": "彰化縣竹塘鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 4,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.564399,
+          23.831141
+        ]
+      },
+      "properties": {
+        "id": "ENV-022",
+        "name": "彰化縣溪州鄉清潔隊資源回收場",
+        "town": "溪州鄉",
+        "address": "彰化縣溪州鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 5,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.477869,
+          24.078238
+        ]
+      },
+      "properties": {
+        "id": "ENV-023",
+        "name": "彰化縣鹿港鎮清潔隊資源回收場",
+        "town": "鹿港鎮",
+        "address": "彰化縣鹿港鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 6,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.472709,
+          24.02487
+        ]
+      },
+      "properties": {
+        "id": "ENV-024",
+        "name": "彰化縣福興鄉清潔隊資源回收場",
+        "town": "福興鄉",
+        "address": "彰化縣福興鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 7,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.566379,
+          23.862352
+        ]
+      },
+      "properties": {
+        "id": "ENV-025",
+        "name": "彰化縣北斗鎮清潔隊資源回收場",
+        "town": "北斗鎮",
+        "address": "彰化縣北斗鎮環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 8,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.564575,
+          23.888766
+        ]
+      },
+      "properties": {
+        "id": "ENV-026",
+        "name": "彰化縣田尾鄉清潔隊資源回收場",
+        "town": "田尾鄉",
+        "address": "彰化縣田尾鄉環境清潔業務服務據點",
+        "source_type": "環保局示範點位",
+        "work_type": "清潔隊資源回收",
+        "staff_count": 9,
+        "shade_info": "請依現地盤點補充遮蔭、飲水與休息空間資訊",
+        "risk_note": "系統會依所在鄉鎮即時計算目前氣候風險等級",
+        "adaptation_action": "建議補齊現地座標、聯絡資訊與高溫／淹水應變措施"
+      }
+    }
+  ]
+}
