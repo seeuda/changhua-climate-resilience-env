@@ -183,8 +183,8 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         phoneField: 'phone',
-        countLabel: '長照據點',
-        groupLabel: '長照服務據點',
+        countLabel: '日照',
+        groupLabel: '日照中心',
         emptyText: '本區尚無日照與小規機構',
         categoryFields: [
             { field: 'case_type', tagClass: 'tag-case' },
@@ -230,7 +230,7 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         countLabel: '隊部',
-        groupLabel: '環保設施（子類別）',
+        groupLabel: '環保設施',
         categoryFields: [
             { field: 'category', tagClass: 'tag-service' },
             { field: 'sub_type', tagClass: 'tag-case' }
@@ -269,7 +269,7 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         countLabel: '回收場',
-        groupLabel: '環保設施（子類別）',
+        groupLabel: '環保設施',
         categoryFields: [
             { field: 'category', tagClass: 'tag-service' },
             { field: 'sub_type', tagClass: 'tag-case' }
