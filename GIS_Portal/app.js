@@ -184,6 +184,7 @@ const POINT_REGISTRY = {
         addressField: 'address',
         phoneField: 'phone',
         countLabel: '日照',
+        groupLabel: '日照中心',
         emptyText: '本區尚無日照與小規機構',
         categoryFields: [
             { field: 'case_type', tagClass: 'tag-case' },
@@ -229,6 +230,7 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         countLabel: '隊部',
+        groupLabel: '環保設施',
         categoryFields: [
             { field: 'category', tagClass: 'tag-service' },
             { field: 'sub_type', tagClass: 'tag-case' }
@@ -267,6 +269,7 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         countLabel: '回收場',
+        groupLabel: '環保設施',
         categoryFields: [
             { field: 'category', tagClass: 'tag-service' },
             { field: 'sub_type', tagClass: 'tag-case' }
@@ -304,6 +307,7 @@ const POINT_REGISTRY = {
         townField: 'town',
         addressField: 'address',
         countLabel: '環保設施',
+        showInSelector: false,
         categoryFields: [
             { field: 'category', tagClass: 'tag-service' },
             { field: 'sub_type', tagClass: 'tag-case' }
@@ -1399,17 +1403,33 @@ function renderPointLayerSelector() {
     const selector = document.getElementById('point-layer-selector');
     if (!selector) return;
 
-    selector.innerHTML = Object.values(POINT_REGISTRY).map(config => {
-        const dataset = pointDatasets[config.id] || originalPointDatasets[config.id];
-        const count = dataset ? filterPointDataset(dataset, config).features.length : 0;
-        const active = activePointLayerIds.has(config.id) && dataset;
-        return `
-            <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" ${dataset ? '' : 'disabled'}>
-                <span class="point-layer-chip-main"><i class="fa-solid ${config.icon}"></i> ${config.label}</span>
-                <span class="point-layer-chip-meta">${count} 處</span>
-            </button>
-        `;
-    }).join('');
+    const selectorConfigs = Object.values(POINT_REGISTRY).filter(config => config.showInSelector !== false);
+    const groups = selectorConfigs.reduce((acc, config) => {
+        const groupLabel = config.groupLabel || '業務點位';
+        if (!acc.has(groupLabel)) acc.set(groupLabel, []);
+        acc.get(groupLabel).push(config);
+        return acc;
+    }, new Map());
+
+    selector.innerHTML = Array.from(groups.entries()).map(([groupLabel, configs]) => `
+        <div class="point-layer-group">
+            <div class="point-layer-group-title">${groupLabel}</div>
+            ${configs.map(config => {
+                const dataset = pointDatasets[config.id] || originalPointDatasets[config.id];
+                const count = dataset ? filterPointDataset(dataset, config).features.length : 0;
+                const active = activePointLayerIds.has(config.id) && dataset;
+                return `
+                    <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" aria-label="${config.label}，${active ? '已選取' : '未選取'}，共 ${count} 處" ${dataset ? '' : 'disabled'}>
+                        <span class="point-layer-chip-main"><i class="fa-solid ${config.icon}"></i> ${config.label}</span>
+                        <span class="point-layer-chip-meta">
+                            <span>${count} 處</span>
+                            ${active ? '<span class="point-layer-chip-status"><i class="fa-solid fa-check"></i> 已選取</span>' : ''}
+                        </span>
+                    </button>
+                `;
+            }).join('')}
+        </div>
+    `).join('');
 }
 
 function setupPointLayerSelector() {
