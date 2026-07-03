@@ -957,6 +957,18 @@ function updateHighRiskCard(total, label) {
     }
 }
 
+function updateTotalPointCard() {
+    const totalCard = document.querySelector('.total-centers');
+    if (!totalCard) return;
+
+    const totalLabel = totalCard.querySelector('.stat-label');
+    const totalValue = totalCard.querySelector('.stat-value');
+    const total = getActivePointFeatures().length;
+
+    totalLabel.innerText = `目前顯示${getActivePointSummaryLabel()}`;
+    totalValue.innerText = total;
+}
+
 function getRiskDistribution() {
     const riskField = getActiveRiskField();
     const townRisks = {};
@@ -1005,6 +1017,8 @@ function getWraDepthDistribution() {
 
 function updateStatsAndChart() {
     if (!townGeoJsonData) return;
+
+    updateTotalPointCard();
 
     // Dynamically update the legend content
     updateLegendUI();
