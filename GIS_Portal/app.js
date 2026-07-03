@@ -1419,9 +1419,12 @@ function renderPointLayerSelector() {
                 const count = dataset ? filterPointDataset(dataset, config).features.length : 0;
                 const active = activePointLayerIds.has(config.id) && dataset;
                 return `
-                    <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" ${dataset ? '' : 'disabled'}>
+                    <button class="point-layer-chip ${active ? 'active' : ''}" type="button" data-point-layer="${config.id}" aria-pressed="${Boolean(active)}" aria-label="${config.label}，${active ? '已選取' : '未選取'}，共 ${count} 處" ${dataset ? '' : 'disabled'}>
                         <span class="point-layer-chip-main"><i class="fa-solid ${config.icon}"></i> ${config.label}</span>
-                        <span class="point-layer-chip-meta">${count} 處</span>
+                        <span class="point-layer-chip-meta">
+                            <span>${count} 處</span>
+                            ${active ? '<span class="point-layer-chip-status"><i class="fa-solid fa-check"></i> 已選取</span>' : ''}
+                        </span>
                     </button>
                 `;
             }).join('')}
